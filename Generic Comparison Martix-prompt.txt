@@ -1,0 +1,999 @@
+# Copyright 2026, Battelle Energy Alliance, LLC, ALL RIGHTS RESERVED
+
+# Complete Recreation Prompt: Interactive Comparison Matrix Generator
+
+## Overview
+Create a self-contained HTML artifact that generates an interactive, multi-category comparison matrix for any topic with comprehensive citations. The artifact must be a single HTML file with embedded CSS and JavaScript.
+
+---
+
+## Initial User Interaction Flow
+
+When the user requests a comparison matrix for a topic, ask:
+1. **Topic confirmation**: "I'll create a comprehensive comparison matrix for [TOPIC]. To ensure maximum value..."
+2. **Scope**: "How many items should I include? (Recommended: 50-100)"
+3. **Focus areas**: "Are there specific aspects or features to emphasize?"
+4. **Categories**: "Should I determine optimal groupings, or do you have preferred categories?"
+
+After gathering requirements, research thoroughly and build the complete artifact.
+
+---
+
+## Technical Architecture
+
+### Variable Naming Convention
+**CRITICAL**: Use unique suffixes to avoid declaration conflicts:
+- `toolsData` (NOT `tools`)
+- `categoriesData` (NOT `categories`)
+- `toolSources` (NOT `sources`)
+- Any other major data structures should have descriptive, unique names
+
+### Data Structure Requirements
+
+#### 1. Items Array (`toolsData`)
+```javascript
+const toolsData = [
+    ["Item Name", "categoryKey", "Category Display Name", "Column1", "Column2", ...],
+    // Each item is an array with:
+    // [0] = Item name (string)
+    // [1] = Category key (string, lowercase, no spaces)
+    // [2] = Category display name (string)
+    // [3+] = Data for each comparison column
+];
+```
+
+#### 2. Categories Object (`categoriesData`)
+```javascript
+const categoriesData = {
+    'categorykey': { name: 'Display Name', count: 12 },
+    // Keys must match item[1] values
+    // Include exact count of items in each category
+};
+```
+
+#### 3. Sources Object (`toolSources`)
+```javascript
+const toolSources = {
+    'Item Name': [
+        'https://main-website.com/',           // [0] Main/general
+        'https://pricing-page.com/',           // [1] Cost/License
+        'https://platform-info.com/',          // [2] Platform/Installation
+        'https://api-docs.com/',               // [3] GUI/Scripting/Basic Features
+        'https://features-page.com/',          // [4] Advanced Features
+        'https://full-documentation.com/'      // [5] Comprehensive docs
+    ]
+    // MUST have 6 URLs per item for proper citation mapping
+};
+```
+
+---
+
+## HTML Structure
+
+### 1. Main Container
+```html
+<div class="container">
+    <div class="header">
+        <h1>🔍 [TOPIC] - Comprehensive Comparison Matrix</h1>
+        <div class="subtitle">Compare X tools across Y essential features with detailed source citations</div>
+    </div>
+    
+    <div class="toc">
+        <h2>📑 Categories</h2>
+        <div class="toc-list">
+            <!-- Dynamically generated category cards -->
+        </div>
+    </div>
+
+    <div class="stats">
+        <!-- 4 stat items -->
+    </div>
+</div>
+
+<div id="tables-container">
+    <!-- JavaScript generates category sections here -->
+</div>
+```
+
+### 2. Category Section Structure (Generated)
+Each category creates:
+```html
+<div class="category-section" id="categorykey">
+    <div class="category-header categorykey">Category Name (X tools)</div>
+    <div class="table-wrapper">
+        <table><!-- Dynamic table --></table>
+    </div>
+    <div class="footnotes">
+        <h3>📚 Sources</h3>
+        <ol><!-- Numbered citations --></ol>
+    </div>
+</div>
+```
+
+---
+
+## CSS Styling Requirements
+
+### Core Page Styling
+```css
+body {
+    background: white; /* Clean white background */
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+    min-height: 100vh;
+    padding: 20px;
+}
+
+.container {
+    max-width: 100%;
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+    overflow: hidden;
+}
+```
+
+### Color Scheme
+**Assign unique gradient colors to each category** (9 examples):
+```css
+.category-header.category1 { background: linear-gradient(135deg, #2196F3 0%, #1976D2 100%); }
+.category-header.category2 { background: linear-gradient(135deg, #9C27B0 0%, #7B1FA2 100%); }
+.category-header.category3 { background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); }
+.category-header.category4 { background: linear-gradient(135deg, #4CAF50 0%, #388E3C 100%); }
+.category-header.category5 { background: linear-gradient(135deg, #F44336 0%, #D32F2F 100%); }
+.category-header.category6 { background: linear-gradient(135deg, #E91E63 0%, #C2185B 100%); }
+.category-header.category7 { background: linear-gradient(135deg, #009688 0%, #00796B 100%); }
+.category-header.category8 { background: linear-gradient(135deg, #8BC34A 0%, #689F38 100%); }
+.category-header.category9 { background: linear-gradient(135deg, #673AB7 0%, #512DA8 100%); }
+```
+
+Apply same colors to TOC items:
+```css
+.toc-item.category1 { border-left-color: #2196F3; }
+```
+
+Apply same colors to table row borders:
+```css
+tbody tr.category1-row td:first-child { border-left-color: #2196F3; }
+```
+
+### Category Section Styling
+```css
+.category-section {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.category-header {
+    color: white;
+    padding: 15px 30px;
+    font-size: 20px;
+    font-weight: 700;
+    position: sticky;
+    top: 0;
+    z-index: 5;
+    border-radius: 12px 12px 0 0; /* Rounded top corners */
+}
+```
+
+### Table Styling - UPDATED
+```css
+table {
+    width: 100%;
+    min-width: 2400px;
+    border-collapse: separate;
+    border-spacing: 0;
+    font-size: 12px;
+}
+
+th {
+    background: linear-gradient(180deg, #2c3e50 0%, #34495e 100%);
+    padding: 14px 12px;
+    text-align: left;
+    font-weight: 700;
+    color: white;
+    border-right: 1px solid #455a75;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+th:first-child {
+    min-width: 150px;
+}
+
+td {
+    padding: 14px 12px;
+    border-bottom: 1px solid #e9ecef;
+    border-right: 1px solid #f0f0f0;
+    vertical-align: middle;
+    background: white;
+}
+
+td:first-child {
+    border-left: 3px solid; /* Colored by category */
+    font-weight: 700;
+    background: #f8f9fa;
+    position: sticky;
+    left: 0;
+    z-index: 5;
+    box-shadow: 2px 0 4px rgba(0,0,0,0.05);
+}
+
+tbody tr:nth-child(even) td:not(:first-child) {
+    background: #fafbfc;
+}
+
+tbody tr:hover td {
+    background: #fff9e6 !important;
+}
+
+tbody tr:hover td:first-child {
+    background: #fff3cd !important;
+}
+```
+
+### Cell Value Styling - UPDATED (Minimalist Approach)
+```css
+.yes {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 13px;
+}
+
+.no {
+    color: #2c3e50;
+    font-style: normal;
+    font-weight: 400;
+}
+
+.partial {
+    color: #2c3e50;
+    font-weight: 400;
+    font-size: 12px;
+}
+
+.tool-name {
+    font-weight: 700;
+    color: #2c3e50;
+    font-size: 13px;
+}
+
+sup {
+    font-size: 8px;
+    color: #667eea;
+    font-weight: 600;
+    margin-left: 2px;
+}
+```
+
+**Key Changes from Original:**
+- NO colored badges or backgrounds for any values
+- All text is black (#2c3e50)
+- Simple checkmark (✓) character for "yes" values
+- Clean, minimal, print-friendly design
+- Professional documentation aesthetic
+
+Apply based on content:
+- `.yes`: "✓", "Yes", "Supported", "Available" → Display as simple black checkmark
+- `.no`: "✗", "N/A", "No", "None", "Unsupported" → Display as-is in black
+- `.partial`: "Via", "Some", "Limited", "Basic", "Partial" → Display as-is in black
+
+### Critical Styling
+```css
+tbody tr {
+    transition: all 0.2s ease;
+}
+
+.footnotes ol {
+    columns: 2;
+    column-gap: 30px;
+}
+
+.footnotes li {
+    break-inside: avoid;
+}
+```
+
+---
+
+## JavaScript Implementation
+
+### Core Functions Required
+
+#### 1. Column Filtering Logic
+```javascript
+function shouldIncludeColumn(columnIndex, categoryTools) {
+    const values = categoryTools.map(tool => tool[columnIndex]);
+    const nonEmptyValues = values.filter(v => v !== 'N/A' && v !== '✗');
+    return nonEmptyValues.length > 0;
+}
+```
+
+#### 2. Global Source Management
+```javascript
+let globalSourceCounter = 1;
+const globalSourceMap = {};
+
+function getSourceRef(url) {
+    if (!globalSourceMap[url]) {
+        globalSourceMap[url] = globalSourceCounter++;
+    }
+    return globalSourceMap[url];
+}
+```
+
+#### 3. Table Rendering Logic
+```javascript
+function renderTables() {
+    const container = document.getElementById('tables-container');
+    const headers = getColumnHeaders();
+    const totalColumns = toolsData[0].length;
+    
+    Object.keys(categoriesData).forEach(catKey => {
+        const categoryTools = toolsData.filter(tool => tool[1] === catKey);
+        const localSourceRefs = [];
+        
+        // Determine which columns to include
+        const columnsToInclude = [];
+        for (let i = 0; i < totalColumns; i++) {
+            if (i === 1 || i === 2) continue; // Skip internal category columns
+            const adjustedIndex = i > 2 ? i - 2 : i;
+            if (i === 0 || shouldIncludeColumn(i, categoryTools)) {
+                columnsToInclude.push({ originalIndex: i, headerIndex: adjustedIndex });
+            }
+        }
+        
+        // Create section, header, table
+        // For each row, assign citations per column
+        // Build footnotes section
+    });
+}
+```
+
+#### 4. Citation Assignment Per Cell - UPDATED
+**CRITICAL LOGIC**: Map columns to appropriate source URLs and wrap values in spans:
+```javascript
+columnsToInclude.forEach((col, colIdx) => {
+    const cell = tool[col.originalIndex];
+    const td = document.createElement('td');
+    
+    // Map column index to source array index
+    let sourceUrl = toolUrls[0] || '#'; // Default to main
+    if (colIdx === 1) sourceUrl = toolUrls[1] || toolUrls[0];      // Cost/License
+    else if (colIdx === 2) sourceUrl = toolUrls[2] || toolUrls[0]; // Platform
+    else if (colIdx >= 3 && colIdx <= 5) sourceUrl = toolUrls[3] || toolUrls[0]; // Basic features
+    else if (colIdx >= 6) sourceUrl = toolUrls[4] || toolUrls[0];  // Advanced features
+    
+    const refNum = getSourceRef(sourceUrl);
+    
+    // Track for local footnotes
+    if (!localSourceRefs.find(ref => ref.num === refNum)) {
+        localSourceRefs.push({ num: refNum, url: sourceUrl, tool: toolName });
+    }
+    
+    // Add citation to cell - WRAP IN SPANS, NOT TD CLASSES
+    if (col.originalIndex === 0) {
+        td.className = 'tool-name';
+        td.innerHTML = `${cell}<sup>${refNum}</sup>`;
+    } else {
+        const cellLower = typeof cell === 'string' ? cell.toLowerCase() : '';
+        
+        if (cell === '✓' || cellLower === 'yes' || cellLower === 'supported' || cellLower === 'available') {
+            // Use span for styling, not td
+            td.innerHTML = `<span class="yes">✓</span><sup>${refNum}</sup>`;
+        } else if (cell === '✗' || cell === 'N/A' || cellLower === 'no' || cellLower === 'none') {
+            td.className = 'no';
+            td.innerHTML = `${cell}<sup>${refNum}</sup>`;
+        } else if (cellLower.includes('via') || cellLower.includes('some') || 
+                   cellLower.includes('limited') || cellLower.includes('basic') ||
+                   cellLower.includes('partial')) {
+            // Use span for styling, not td
+            td.innerHTML = `<span class="partial">${cell}</span><sup>${refNum}</sup>`;
+        } else {
+            td.innerHTML = `${cell}<sup>${refNum}</sup>`;
+        }
+    }
+});
+```
+
+**CRITICAL**: Wrap badge classes in `<span>` elements, NOT apply to `<td>` elements to prevent cell merging issues.
+
+#### 5. Row Class Assignment
+```javascript
+const row = document.createElement('tr');
+row.className = `${catKey}-row`; // Add category class for border coloring
+```
+
+#### 6. Smooth Scroll Navigation
+```javascript
+document.querySelectorAll('.toc-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const target = document.getElementById(targetId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+```
+
+---
+
+## Column Header Function
+```javascript
+function getColumnHeaders() {
+    return [
+        'Item Name',
+        'Column 1',
+        'Column 2',
+        // ... based on topic
+        // Typically 15-20 columns total
+    ];
+}
+```
+
+---
+
+## Layout Specifications
+
+### Container Dimensions
+- Body: `min-height: 100vh; padding: 20px; background: white;`
+- Container: `max-width: 100%; border-radius: 12px;`
+- Table: `min-width: 2400px;` (adjust based on column count)
+- Table wrapper: `overflow-x: auto;`
+
+### Padding Standards
+- Header: `padding: 30px;`
+- Controls/TOC: `padding: 30px;`
+- Category header: `padding: 15px 30px;`
+- Table wrapper: `padding: 20px 30px 30px;`
+- Table cells: `padding: 14px 12px;`
+- Table headers: `padding: 14px 12px;`
+- Footnotes: `padding: 20px 30px;`
+
+### Font Sizes
+- H1: `28px`
+- Subtitle: `14px`
+- Category headers: `20px`
+- TOC items: `13px` (name), `11px` (count)
+- Table headers: `11px`
+- Table cells: `12px`
+- Tool names: `13px`
+- Checkmarks: `13px`
+- Footnotes: `10px`
+- Superscripts: `8px`
+
+---
+
+## Statistics Bar Configuration
+
+Display exactly 4 statistics:
+```javascript
+<div class="stat-item">
+    <div class="stat-label">Total Items</div>
+    <div class="stat-value">[COUNT]</div>
+</div>
+<div class="stat-item">
+    <div class="stat-label">Categories</div>
+    <div class="stat-value">[COUNT]</div>
+</div>
+<div class="stat-item">
+    <div class="stat-label">Comparison Points</div>
+    <div class="stat-value">[COLUMN_COUNT]</div>
+</div>
+<div class="stat-item">
+    <div class="stat-label">Total Citations</div>
+    <div class="stat-value" id="citationCount">Loading...</div>
+</div>
+```
+
+Update citation count: `document.getElementById('citationCount').textContent = Object.keys(globalSourceMap).length;`
+
+---
+
+## Footnotes Section Requirements
+
+### Structure
+```html
+<div class="footnotes">
+    <h3>📚 Sources</h3>
+    <ol>
+        <li value="1"><a href="..." target="_blank" rel="noopener">URL</a></li>
+        <li value="2"><a href="..." target="_blank" rel="noopener">URL</a></li>
+        <!-- Numbered list continues -->
+    </ol>
+</div>
+```
+
+### Styling
+```css
+.footnotes {
+    padding: 20px 30px;
+    background: #f8f9fa;
+    border-top: 2px solid #e9ecef;
+    font-size: 10px;
+    color: #495057;
+}
+
+.footnotes ol {
+    columns: 2;              /* Two-column layout */
+    column-gap: 30px;
+    padding-left: 20px;
+}
+
+.footnotes li {
+    break-inside: avoid;     /* Prevent column breaks mid-item */
+    margin-bottom: 8px;
+    line-height: 1.5;
+}
+
+.footnotes a {
+    color: #667eea;
+    word-break: break-all;   /* Wrap long URLs */
+}
+```
+
+### Citation Logic
+- Sort local references by reference number before displaying
+- Use `li.value = refNum` to set explicit list numbers
+- Only include unique URLs per category table
+- Track all URLs globally but display per-category
+
+---
+
+## Table of Contents (TOC) Implementation
+
+### HTML Structure
+```html
+<div class="toc-list">
+    <div class="toc-item categorykey" data-target="categorykey">
+        <div class="toc-name">Category Display Name</div>
+        <div class="toc-count">X tools</div>
+    </div>
+    <!-- Repeat for each category -->
+</div>
+```
+
+### Critical Details
+- **Use `<div>` NOT `<a>`** to avoid external website warnings
+- Use `data-target` attribute with category key
+- Apply category-specific color via class
+- Show exact item count per category
+
+### Click Handler
+```javascript
+document.querySelectorAll('.toc-item').forEach(item => {
+    item.addEventListener('click', function() {
+        const targetId = this.getAttribute('data-target');
+        const target = document.getElementById(targetId);
+        if (target) {
+            target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+    });
+});
+```
+
+---
+
+## Dynamic Column Filtering
+
+### Implementation
+```javascript
+const columnsToInclude = [];
+for (let i = 0; i < totalColumns; i++) {
+    if (i === 1 || i === 2) continue; // Skip category identifier and display name
+    const adjustedIndex = i > 2 ? i - 2 : i;
+    if (i === 0 || shouldIncludeColumn(i, categoryTools)) {
+        columnsToInclude.push({ 
+            originalIndex: i, 
+            headerIndex: adjustedIndex 
+        });
+    }
+}
+```
+
+### Rules
+- **Always include column 0** (item name)
+- **Skip columns 1 and 2** (internal category data)
+- **Filter out columns** where all values are "✗" or "N/A"
+- **Each category gets its own filtered column set**
+- Adjust header indices to account for skipped columns
+
+---
+
+## Cell Styling Logic - UPDATED
+
+### Classification Rules
+```javascript
+if (col.originalIndex === 0) {
+    td.className = 'tool-name';
+    td.innerHTML = `${cell}<sup>${refNum}</sup>`;
+} else {
+    const cellLower = typeof cell === 'string' ? cell.toLowerCase() : '';
+    
+    if (cell === '✓' || cellLower === 'yes' || cellLower === 'supported' || cellLower === 'available') {
+        // Wrap in span, display simple checkmark
+        td.innerHTML = `<span class="yes">✓</span><sup>${refNum}</sup>`;
+    } else if (cell === '✗' || cell === 'N/A' || cellLower === 'no' || cellLower === 'none') {
+        td.className = 'no';
+        td.innerHTML = `${cell}<sup>${refNum}</sup>`;
+    } else if (cellLower.includes('via') || cellLower.includes('some') || 
+               cellLower.includes('limited') || cellLower.includes('basic') ||
+               cellLower.includes('partial')) {
+        // Wrap in span
+        td.innerHTML = `<span class="partial">${cell}</span><sup>${refNum}</sup>`;
+    } else {
+        td.innerHTML = `${cell}<sup>${refNum}</sup>`;
+    }
+}
+```
+
+**Apply to EVERY cell including tool name**
+
+---
+
+## Source URL Mapping Strategy
+
+### Column-to-Source Index Mapping
+Based on column position after filtering:
+- **Column 0** (Item Name): `toolUrls[0]` - Main website
+- **Column 1** (Cost/License): `toolUrls[1]` - Pricing/license page
+- **Column 2** (Platform): `toolUrls[2]` - Installation/compatibility
+- **Columns 3-5** (Basic features): `toolUrls[3]` - Feature docs/API
+- **Columns 6+** (Advanced features): `toolUrls[4]` - Advanced documentation
+
+### Fallback Pattern
+```javascript
+sourceUrl = toolUrls[targetIndex] || toolUrls[0] || '#';
+```
+Always fallback to main URL, then to '#' if no sources exist.
+
+---
+
+## Responsive Behavior
+
+### Table Scrolling
+```css
+.table-wrapper {
+    overflow-x: auto;
+    padding: 20px 30px 30px;
+}
+
+table {
+    min-width: 2400px; /* Adjust based on column count */
+}
+```
+
+### Stats Bar Wrapping
+```css
+.stats {
+    display: flex;
+    gap: 30px;
+    flex-wrap: wrap; /* Allow wrapping on narrow screens */
+}
+```
+
+### TOC Grid
+```css
+.toc-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 10px;
+}
+```
+
+---
+
+## Hover Effects & Transitions
+
+### Table Rows
+```css
+tbody tr {
+    transition: all 0.2s ease;
+}
+
+tbody tr:hover td {
+    background: #fff9e6 !important;
+}
+
+tbody tr:hover td:first-child {
+    background: #fff3cd !important;
+}
+```
+
+### TOC Items
+```css
+.toc-item {
+    transition: all 0.2s ease;
+}
+
+.toc-item:hover {
+    transform: translateX(5px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+```
+
+---
+
+## Complete Rendering Pipeline
+
+### 1. Initialize on DOMContentLoaded
+```javascript
+document.addEventListener('DOMContentLoaded', () => {
+    renderTables();
+    attachTOCHandlers();
+});
+```
+
+### 2. Render Tables Function Flow
+```
+For each category:
+  1. Filter tools for this category
+  2. Determine which columns to include (dynamic filtering)
+  3. Create category section with colored header (rounded corners)
+  4. Create table with thead (dark gradient header)
+  5. Build header row with filtered columns
+  6. For each tool in category:
+     a. Create row with category class (e.g., "disassembler-row")
+     b. For each included column:
+        - Get appropriate source URL based on column index
+        - Get or create global source reference number
+        - Track in local source refs
+        - Apply cell styling (wrap in spans, not td classes)
+        - Add cell content with superscript citation
+  7. Append table to wrapper
+  8. Create footnotes section
+  9. Sort local refs by reference number
+  10. Generate numbered list of sources
+  11. Append section to container
+```
+
+### 3. Update Citation Count
+After all tables rendered:
+```javascript
+document.getElementById('citationCount').textContent = Object.keys(globalSourceMap).length;
+```
+
+---
+
+## Data Research Guidelines
+
+### When Given a Topic
+
+1. **Identify Categories** (aim for 5-12)
+   - Group similar items together
+   - Balance category sizes (avoid 1-2 item categories)
+   - Use clear, descriptive names
+
+2. **Select Comparison Criteria** (15-20 columns)
+   - Start with universal criteria: Name, Cost, Platform, License
+   - Add topic-specific technical features
+   - Include integration/compatibility columns
+   - Add support/community columns
+   - Consider user experience factors
+
+3. **Gather Data Points**
+   - Research each item thoroughly
+   - Use consistent value formats (✓/✗ for boolean, descriptive text for complex)
+   - Mark uncertain data as "N/A" rather than guessing
+   - Ensure data accuracy from official sources
+
+4. **Collect Source URLs**
+   - **6 URLs per item minimum**
+   - Prioritize official documentation over third-party
+   - Use specific subpages, not just homepage
+   - Map URLs to column types:
+     - [0] Main website/overview
+     - [1] Pricing/licensing
+     - [2] Platform/system requirements
+     - [3] API/scripting documentation
+     - [4] Feature list/capabilities
+     - [5] Full documentation/manual
+
+---
+
+## Value Formatting Standards
+
+### Boolean-style columns
+- Use: `✓` for yes/supported (displays as simple black checkmark)
+- Use: `✗` for no/unsupported (displays as black text)
+- Use: `N/A` for not applicable (displays as black text)
+- Use descriptive partials: "Via plugin", "Limited", "Basic", "Some support" (displays as black text)
+
+### Text columns
+- Keep concise (under 30 characters ideal)
+- Use common abbreviations where clear
+- Separate multiple values with "/"
+- Use "+more" or "+" to indicate additional items
+
+### Special Values
+- "N/A" - Feature not applicable to this item type
+- "Via X" - Available through another mechanism
+- "Limited" - Partial or restricted support
+- "Basic" - Minimal implementation
+- "Advanced" - Comprehensive implementation
+
+---
+
+## Category Assignment Strategy
+
+### Grouping Principles
+1. **Functional similarity** - Tools serving similar purposes
+2. **User persona** - Tools targeting same user types
+3. **Technical approach** - Tools using similar methodologies
+4. **Balanced distribution** - Aim for 3-15 items per category
+
+### Category Key Format
+- Lowercase
+- No spaces (use underscores if needed)
+- Short, memorable
+- Examples: `disassembler`, `debugger`, `static_analysis`
+
+---
+
+## Common Pitfalls to Avoid
+
+### ❌ Don't Do
+- Use duplicate variable names (`tools`, `categories`, `sources`)
+- Use `<a href="#...">` for TOC (causes external link warning)
+- Include columns with all ✗ or N/A values
+- Forget citations on any cell
+- Use fewer than 6 source URLs per item
+- Hard-code table HTML (must be JavaScript-generated)
+- Forget to update citation count
+- Use `localStorage` or `sessionStorage`
+- **Apply badge classes to `<td>` elements** (causes cell merging)
+- **Use colored badges or backgrounds** (not minimalist)
+
+### ✅ Do
+- Use unique variable names with suffixes (`toolsData`, `categoriesData`, `toolSources`)
+- Use `<div data-target="...">` for TOC navigation
+- Filter columns dynamically per category
+- Add superscript to every cell
+- Provide 6 specific source URLs per item
+- Generate tables via JavaScript
+- Update stats dynamically
+- Keep all data in JavaScript variables
+- **Wrap badge classes in `<span>` elements inside cells**
+- **Use simple black checkmarks without colored backgrounds**
+- **Add row classes for category border colors** (`${catKey}-row`)
+- **Add 40px margin-top to all category sections**
+
+---
+
+## Quality Checklist
+
+Before finalizing artifact:
+- [ ] All items have complete data across all columns
+- [ ] All items have 6 source URLs
+- [ ] Every cell has a superscript citation
+- [ ] Column filtering removes empty columns per category
+- [ ] TOC navigation works without external link warnings
+- [ ] Citation count updates correctly
+- [ ] All category colors are distinct and visible
+- [ ] Hover effects work on rows and TOC items
+- [ ] Footnotes display in 2-column layout
+- [ ] Table headers are sticky during scroll
+- [ ] No JavaScript console errors
+- [ ] No duplicate variable declarations
+- [ ] Smooth scroll works for all TOC items
+- [ ] Badge classes wrapped in spans, not applied to td elements
+- [ ] Simple black checkmarks used (no colored badges)
+- [ ] White background on body
+- [ ] Category headers have rounded top corners
+- [ ] First column is sticky with colored left border
+- [ ] 40px spacing above first table
+
+---
+
+## Design Philosophy - UPDATED
+
+### Minimalist Professional Aesthetic
+- **White background** - Clean, professional canvas
+- **Simple black checkmarks** (✓) - No colored badges
+- **All text in black** - Consistent typography
+- **Dark gradient headers** - Professional contrast
+- **Sticky first column** - Always visible tool names
+- **Colored category borders** - Subtle visual organization
+- **Rounded corners** - Soft, modern appearance
+- **Print-friendly** - Clean design suitable for documentation
+
+### Key Visual Principles
+1. **Consistency** - All text values use same black color
+2. **Clarity** - Dark headers contrast with white cells
+3. **Scannability** - Alternating row backgrounds aid reading
+4. **Focus** - Hover states highlight current row
+5. **Professional** - Minimalist design suitable for business use
+
+---
+
+## Example Column Sets by Topic Type
+
+### Software/Tools Topics
+Cost & License, Platform, GUI, API, Scripting, Plugin Support, Cloud/Web, Integration, Documentation, Community, Support, Use Case, Features, Performance
+
+### Programming Languages
+Paradigm, Typing, Performance, Memory Management, Concurrency, Package Manager, IDE Support, Learning Curve, Community, Use Cases, Platforms, Compilation, Standard Library
+
+### Hardware/Devices
+Price, Platform, Specifications, Connectivity, Battery Life, Display, Performance, Build Quality, Software Support, Warranty, Availability, Use Cases
+
+### Services/Platforms
+Pricing Model, Features, Storage, Bandwidth, API, Integrations, Support, SLA, Security, Compliance, Scalability, Use Cases
+
+---
+
+## Customization Points
+
+When adapting for different topics:
+
+1. **Keep white background** for professional look
+2. **Modify column headers** to fit topic terminology
+3. **Use simple checkmarks** for boolean values (no badges)
+4. **Scale item count** based on topic breadth (20-150 items)
+5. **Tune category count** (3-12 categories typical)
+6. **Customize column count** (12-25 columns typical)
+7. **Adjust table min-width** based on column count and content length
+8. **Maintain minimalist styling** - black text, no colored backgrounds
+
+---
+
+## Implementation Template
+
+```javascript
+// 1. Define data
+const toolsData = [ /* array of arrays */ ];
+const categoriesData = { /* category metadata */ };
+const toolSources = { /* source URLs */ };
+
+// 2. Initialize global tracking
+let globalSourceCounter = 1;
+const globalSourceMap = {};
+
+// 3. Define helper functions
+function getSourceRef(url) { /* ... */ }
+function shouldIncludeColumn(columnIndex, categoryTools) { /* ... */ }
+function getColumnHeaders() { /* ... */ }
+
+// 4. Main render function
+function renderTables() { 
+    /* ... */
+    // Create row with class
+    const row = document.createElement('tr');
+    row.className = `${catKey}-row`;
+    
+    // Wrap values in spans, not apply to td
+    td.innerHTML = `<span class="yes">✓</span><sup>${refNum}</sup>`;
+    /* ... */
+}
+
+// 5. Initialize on load
+document.addEventListener('DOMContentLoaded', () => {
+    renderTables();
+    // Attach TOC handlers
+});
+```
+
+---
+
+## Final Notes
+
+- **Single file**: Everything in one HTML file
+- **No external dependencies**: Pure HTML/CSS/JS
+- **No network requests**: All data embedded
+- **No storage APIs**: Everything in memory
+- **Full citations**: Every data point sourced
+- **Minimalist design**: Clean, professional, print-friendly
+- **Smooth UX**: Transitions, hover effects, smooth scrolling
+- **Accessible**: Semantic HTML, proper contrast, keyboard navigable
+- **Simple checkmarks**: Black ✓ without colored badges
+- **White canvas**: Professional documentation aesthetic
+
+This prompt captures every implementation detail needed to recreate this comparison matrix style for any topic with the updated minimalist, professional design.
